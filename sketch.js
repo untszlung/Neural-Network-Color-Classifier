@@ -30,7 +30,7 @@ function setup() {
 function modelReady() {
   neuralNetwork.normalizeData();
   const trainingOptions = {
-    epochs: 20,
+    epochs: 100,
     batchSize: 64
   }
   neuralNetwork.train(trainingOptions, whileTraining, finishedTraining);
