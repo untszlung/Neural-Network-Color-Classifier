@@ -16,27 +16,64 @@ function setup() {
   rSlider = createSlider(0, 255, 255);
   gSlider = createSlider(0, 255, 0);
   bSlider = createSlider(0, 255, 255);
-
-  let nnOptions = {
-    dataUrl: 'data/colorData.json',
+  
+  trainButton = createButton('training');
+  trainButton.mousePressed(training);
+  
+  const modelInfo = {
+    model: 'model.json',
+    metadata: 'model_meta.json',
+    weights: 'model.weights.bin'
+  }
+  
+  
+   let nnOptions = {
+    dataUrl: 'colorData2.json',
     inputs: ['r', 'g', 'b'],
     outputs: ['label'],
     task: 'classification',
+       layers: [
+      {
+        type: 'dense',
+        units: 16,
+        activation: 'sigmoid'
+      },
+      {
+        type: 'dense',
+        units: 16,
+        activation: 'sigmoid'
+      },
+      {
+        type: 'dense',
+        activation: 'softmax'
+      }
+    ],
     debug: true
   };
   neuralNetwork = ml5.neuralNetwork(nnOptions, modelReady);
+
+  neuralNetwork.load(modelInfo, classify);
+
+
+ 
 }
 
-function modelReady() {
+
+
+function training() {
   neuralNetwork.normalizeData();
   const trainingOptions = {
-    epochs: 20,
-    batchSize: 64
+    epochs: 1500,
+    batchSize: 512
   }
   neuralNetwork.train(trainingOptions, whileTraining, finishedTraining);
   // Start guessing while training!
   classify();
 
+}
+
+function modelReady(){
+  console.log('created model');
 }
 
 function whileTraining(epoch, logs) {
@@ -45,6 +82,8 @@ function whileTraining(epoch, logs) {
 
 function finishedTraining(anything) {
   console.log('done!');
+  neuralNetwork.save();
+  console.log('save tranning model');
 }
 
 function classify() {
